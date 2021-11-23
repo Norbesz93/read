@@ -3,11 +3,23 @@ const cors = require('cors');
 const db = require('./storage/file-database');
 const bodyParser = require('body-parser');
 
+const wait = (milliseconds) =>
+    new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve();
+        }, milliseconds);
+    });
+
+const bufferMiddleware = async (req,res,next)=>{
+await  wait(2000)
+next()
+}
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bufferMiddleware)
 app.get('/tasks', (req, res) => {
   res.send(db.get('tasks').value());
 });
@@ -22,7 +34,7 @@ app.get('/tasks/filter/', (req, res) => {
 });
 
 app.post('/tasks', (req, res) => {
-  let id; 
+  let id;
   try { 
     id = db .get('tasks') 
     .value() 
